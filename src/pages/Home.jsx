@@ -658,7 +658,7 @@ export default function Home() {
                           )}
                           <div className={styles.variantInfo}>
                             <span className={styles.variantColor}>{variant.color || '기본'}</span>
-                            {variant.gsm && <span className={styles.variantGsm}>{variant.gsm}gsm</span>}
+                            {variant.gsm && <span className={styles.variantGsm}>{variant.gsm}</span>}
                           </div>
                         </button>
                       ))}
@@ -679,7 +679,7 @@ export default function Home() {
                       {selectedVariant.gsm && (
                         <div className={styles.specItem}>
                           <span className={styles.specLabel}>평량</span>
-                          <span className={styles.specValue}>{selectedVariant.gsm}gsm</span>
+                          <span className={styles.specValue}>{selectedVariant.gsm}</span>
                         </div>
                       )}
                       {selectedVariant.standard && (

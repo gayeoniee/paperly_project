@@ -1,13 +1,49 @@
 import { useState, useRef, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Send, Paperclip, ArrowLeft } from 'lucide-react';
 import { chats } from '../../data/mockData';
 import styles from './Chat.module.css';
 
 export default function Chat() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const makerChats = chats.filter(c => c.partnerRole === 'maker');
   const [selectedChat, setSelectedChat] = useState(null);
   const [newMessage, setNewMessage] = useState('');
+  const [chatList, setChatList] = useState(makerChats);
   const messagesEndRef = useRef(null);
+
+  // 새 채팅이 전달되면 처리
+  useEffect(() => {
+    if (location.state?.newChat) {
+      const newPartner = location.state.newChat;
+
+      // 이미 존재하는 채팅인지 확인
+      const existingChat = chatList.find(c => c.partnerId === newPartner.id);
+
+      if (existingChat) {
+        setSelectedChat(existingChat);
+      } else {
+        // 새 채팅 생성
+        const newChat = {
+          id: `chat-new-${Date.now()}`,
+          partnerId: newPartner.id,
+          partnerName: newPartner.name,
+          partnerCompany: newPartner.name,
+          partnerRole: 'maker',
+          lastMessage: '',
+          lastMessageTime: '방금',
+          unreadCount: 0,
+          messages: []
+        };
+        setChatList(prev => [newChat, ...prev]);
+        setSelectedChat(newChat);
+      }
+
+      // state 초기화 (뒤로가기 시 중복 실행 방지)
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, chatList, navigate, location.pathname]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -67,7 +103,7 @@ export default function Chat() {
             placeholder="메시지를 입력하세요..."
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyPress}
             className={styles.input}
           />
           <button
@@ -90,7 +126,7 @@ export default function Chat() {
       </div>
 
       <div className={styles.chatList}>
-        {makerChats.map(chat => (
+        {chatList.map(chat => (
           <button
             key={chat.id}
             className={styles.chatItem}

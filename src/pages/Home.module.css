@@ -1000,9 +1000,9 @@
 .paperModal {
   background: var(--color-background-paper);
   border-radius: var(--radius-xl);
-  max-width: 720px;
-  width: 100%;
-  max-height: 90vh;
+  max-width: 900px;
+  width: 95%;
+  max-height: 92vh;
   overflow-y: auto;
   position: relative;
   box-shadow: var(--shadow-xl);
@@ -1011,11 +1011,11 @@
 .paperModalContent {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-lg);
+  gap: var(--space-xl);
 }
 
 .paperModalImage {
-  height: 400px;
+  height: 500px;
   background: linear-gradient(135deg, var(--color-accent-warm), var(--color-accent));
   overflow: hidden;
 }
@@ -1037,16 +1037,16 @@
 }
 
 .paperModalInfo {
-  padding: var(--space-xl) var(--space-xl) var(--space-xl) 0;
+  padding: var(--space-2xl) var(--space-2xl) var(--space-2xl) 0;
   overflow-y: auto;
-  max-height: 400px;
+  max-height: 500px;
 }
 
 .paperModalTitle {
   font-family: var(--font-heading);
-  font-size: var(--font-size-2xl);
+  font-size: var(--font-size-3xl);
   color: var(--color-text);
-  margin: 0 0 var(--space-md) 0;
+  margin: 0 0 var(--space-lg) 0;
 }
 
 .paperModalTags {

@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Sparkles, ArrowRight, Layers, Palette, X,
-  ChevronLeft, ChevronRight, Star, MapPin, User
+  ChevronLeft, ChevronRight, Star, MapPin, User,
+  MessageCircle, Phone, Award, AlertTriangle
 } from 'lucide-react';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
@@ -13,44 +14,80 @@ import styles from './Home.module.css';
 // 포트폴리오 데이터
 const portfolios = [
   {
-    id: 1,
+    id: 'maker-1',
     shopName: '성원인쇄소',
     specialty: '고급 명함 · 청첩장 전문',
     location: '서울 성동구',
+    phone: '02-1234-5678',
     rating: 4.9,
+    reviews: 128,
     experience: '30년',
     works: ['명함', '청첩장', '브로슈어'],
-    workload: 'RELAXED'
+    workload: 'RELAXED',
+    description: '프리미엄 명함과 청첩장 전문 인쇄소입니다. 섬세한 후가공과 빠른 납기로 많은 디자이너분들께 사랑받고 있습니다.',
+    specialties: ['명함', '청첩장', '고급 후가공', '형압', 'UV인쇄'],
+    portfolio: [
+      { title: '모던 명함 시리즈', description: '심플하고 세련된 명함 디자인' },
+      { title: '프리미엄 청첩장', description: '레터프레스와 금박을 활용한 고급 청첩장' },
+      { title: '브랜드 아이덴티티', description: '일관된 브랜드 이미지를 위한 인쇄물 세트' }
+    ]
   },
   {
-    id: 2,
+    id: 'maker-2',
     shopName: '프린트하우스',
     specialty: '대형 인쇄물 · 포스터',
     location: '서울 마포구',
+    phone: '02-2345-6789',
     rating: 4.8,
+    reviews: 95,
     experience: '15년',
     works: ['포스터', '현수막', '배너'],
-    workload: 'BUSY'
+    workload: 'BUSY',
+    description: '대형 배너, 현수막, 포스터 전문 업체입니다. 최신 장비와 숙련된 기술력으로 완벽한 결과물을 제공합니다.',
+    specialties: ['대형배너', '현수막', '포스터', '실사출력', '래핑'],
+    portfolio: [
+      { title: '전시회 배너', description: '각종 전시회 및 행사용 대형 배너' },
+      { title: '매장 사이니지', description: '브랜드 매장 내외부 사인물' },
+      { title: '이벤트 현수막', description: '행사 및 프로모션용 현수막' }
+    ]
   },
   {
-    id: 3,
+    id: 'maker-3',
     shopName: '아트프레스',
     specialty: '아트북 · 화집 제작',
     location: '서울 종로구',
+    phone: '02-3456-7890',
     rating: 4.9,
+    reviews: 67,
     experience: '25년',
     works: ['아트북', '화집', '도록'],
-    workload: 'NORMAL'
+    workload: 'NORMAL',
+    description: '예술 서적과 화집 제작 전문입니다. 색재현에 특히 강점이 있으며, 작가님들의 작품을 최상의 품질로 인쇄합니다.',
+    specialties: ['아트북', '화집', '도록', '사진집', '고급제본'],
+    portfolio: [
+      { title: '작가 화집', description: '유명 작가의 작품집 인쇄' },
+      { title: '전시 도록', description: '미술관 및 갤러리 전시 도록' },
+      { title: '사진집', description: '고품질 색재현 사진집' }
+    ]
   },
   {
-    id: 4,
+    id: 'maker-4',
     shopName: '에코프린팅',
     specialty: '친환경 인쇄 전문',
     location: '경기 성남시',
+    phone: '031-456-7890',
     rating: 4.7,
+    reviews: 82,
     experience: '10년',
     works: ['리플렛', '카탈로그', '패키지'],
-    workload: 'RELAXED'
+    workload: 'RELAXED',
+    description: 'FSC 인증 종이와 친환경 잉크를 사용하는 지속가능한 인쇄 전문 업체입니다. 환경을 생각하는 브랜드와 함께합니다.',
+    specialties: ['친환경인쇄', 'FSC인증', '콩기름잉크', '재생지', '무코팅'],
+    portfolio: [
+      { title: '친환경 패키지', description: '재생지를 활용한 친환경 패키지' },
+      { title: '지속가능 브랜드북', description: 'ESG 보고서 및 브랜드북' },
+      { title: '에코 굿즈', description: '친환경 소재 프로모션 인쇄물' }
+    ]
   }
 ];
 
@@ -143,6 +180,9 @@ export default function Home() {
   const [loadingPapers, setLoadingPapers] = useState(true);
   const [selectedPaper, setSelectedPaper] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
+  const [selectedPortfolio, setSelectedPortfolio] = useState(null);
+  const [showBusyWarning, setShowBusyWarning] = useState(false);
+  const [pendingPortfolio, setPendingPortfolio] = useState(null);
   const paperScrollRef = useRef(null);
   const portfolioScrollRef = useRef(null);
   const recentOrders = orders.filter(o => o.status !== 'completed').slice(0, 2);
@@ -192,6 +232,58 @@ export default function Home() {
   const closePaperDetail = () => {
     setSelectedPaper(null);
     setSelectedVariant(null);
+  };
+
+  // 포트폴리오 모달 핸들러
+  const openPortfolioDetail = (portfolio) => {
+    setSelectedPortfolio(portfolio);
+  };
+
+  const closePortfolioDetail = () => {
+    setSelectedPortfolio(null);
+  };
+
+  const handleContactClick = (portfolio) => {
+    if (portfolio.workload === 'BUSY' || portfolio.workload === 'NORMAL') {
+      setPendingPortfolio(portfolio);
+      setShowBusyWarning(true);
+    } else {
+      navigateToChat(portfolio);
+    }
+  };
+
+  const navigateToChat = (portfolio) => {
+    setSelectedPortfolio(null);
+    setShowBusyWarning(false);
+    setPendingPortfolio(null);
+    navigate('/designer/chat', {
+      state: {
+        newChat: {
+          id: portfolio.id,
+          name: portfolio.shopName
+        }
+      }
+    });
+  };
+
+  const handleConfirmContact = () => {
+    if (pendingPortfolio) {
+      navigateToChat(pendingPortfolio);
+    }
+  };
+
+  const handleCancelWarning = () => {
+    setShowBusyWarning(false);
+    setPendingPortfolio(null);
+  };
+
+  const getWorkloadLabel = (workload) => {
+    switch (workload) {
+      case 'RELAXED': return '여유';
+      case 'NORMAL': return '보통';
+      case 'BUSY': return '분주';
+      default: return '확인불가';
+    }
   };
 
   return (
@@ -303,7 +395,7 @@ export default function Home() {
                 <div
                   key={portfolio.id}
                   className={styles.portfolioCard}
-                  // onClick={() => openDetail(portfolio)}
+                  onClick={() => openPortfolioDetail(portfolio)}
                 >
                   <div className={styles.portfolioAvatar}>
                     <User size={32} strokeWidth={1.5} />
@@ -432,7 +524,7 @@ export default function Home() {
                           )}
                           <div className={styles.variantInfo}>
                             <span className={styles.variantColor}>{variant.color || '기본'}</span>
-                            {variant.gsm && <span className={styles.variantGsm}>{variant.gsm}gsm</span>}
+                            {variant.gsm && <span className={styles.variantGsm}>{variant.gsm}</span>}
                           </div>
                         </button>
                       ))}'
@@ -453,7 +545,7 @@ export default function Home() {
                       {selectedVariant.gsm && (
                         <div className={styles.specItem}>
                           <span className={styles.specLabel}>평량</span>
-                          <span className={styles.specValue}>{selectedVariant.gsm}gsm</span>
+                          <span className={styles.specValue}>{selectedVariant.gsm}</span>
                         </div>
                       )}
                       {selectedVariant.standard && (
@@ -481,6 +573,119 @@ export default function Home() {
               </Button>
               <Button variant="primary" onClick={() => navigate('/designer/ai-chat')}>
                 이 종이로 견적 요청
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 포트폴리오 상세보기 모달 */}
+      {selectedPortfolio && (
+        <div className={styles.modalOverlay} onClick={closePortfolioDetail}>
+          <div className={styles.portfolioModal} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.closeBtn} onClick={closePortfolioDetail}>
+              <X size={24} />
+            </button>
+
+            <div className={styles.portfolioModalHeader}>
+              <div className={styles.portfolioModalAvatar}>
+                <User size={32} strokeWidth={1.5} />
+              </div>
+              <div className={styles.portfolioModalHeaderInfo}>
+                <h2 className={styles.portfolioModalTitle}>{selectedPortfolio.shopName}</h2>
+                <span className={styles.portfolioModalCategory}>{selectedPortfolio.specialty}</span>
+                <div className={`${styles.workloadBadge} ${styles[selectedPortfolio.workload.toLowerCase()]}`}>
+                  <span className={styles.workloadDot}></span>
+                  <span>{getWorkloadLabel(selectedPortfolio.workload)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.portfolioModalStats}>
+              <div className={styles.portfolioModalStat}>
+                <Star size={16} fill="currentColor" className={styles.starIconModal} />
+                <span className={styles.portfolioModalStatValue}>{selectedPortfolio.rating}</span>
+                <span className={styles.portfolioModalStatLabel}>평점</span>
+              </div>
+              <div className={styles.portfolioModalStat}>
+                <span className={styles.portfolioModalStatValue}>{selectedPortfolio.reviews}</span>
+                <span className={styles.portfolioModalStatLabel}>리뷰</span>
+              </div>
+              <div className={styles.portfolioModalStat}>
+                <Award size={16} className={styles.awardIconModal} />
+                <span className={styles.portfolioModalStatValue}>{selectedPortfolio.experience}</span>
+                <span className={styles.portfolioModalStatLabel}>경력</span>
+              </div>
+            </div>
+
+            <div className={styles.portfolioModalSection}>
+              <p className={styles.portfolioModalDescription}>{selectedPortfolio.description}</p>
+            </div>
+
+            <div className={styles.portfolioModalSection}>
+              <div className={styles.portfolioModalInfoRow}>
+                <MapPin size={16} />
+                <span>{selectedPortfolio.location}</span>
+              </div>
+              <div className={styles.portfolioModalInfoRow}>
+                <Phone size={16} />
+                <span>{selectedPortfolio.phone}</span>
+              </div>
+            </div>
+
+            <div className={styles.portfolioModalSection}>
+              <h3 className={styles.portfolioModalSectionTitle}>전문 분야</h3>
+              <div className={styles.specialtyTags}>
+                {selectedPortfolio.specialties.map((specialty, idx) => (
+                  <span key={idx} className={styles.specialtyTag}>{specialty}</span>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.portfolioModalSection}>
+              <h3 className={styles.portfolioModalSectionTitle}>포트폴리오</h3>
+              <div className={styles.portfolioList}>
+                {selectedPortfolio.portfolio.map((item, idx) => (
+                  <div key={idx} className={styles.portfolioItem}>
+                    <h4 className={styles.portfolioItemTitle}>{item.title}</h4>
+                    <p className={styles.portfolioItemDesc}>{item.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Button
+              variant="primary"
+              fullWidth
+              icon={MessageCircle}
+              size="large"
+              onClick={() => handleContactClick(selectedPortfolio)}
+            >
+              문의하기
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* 바쁨 경고 모달 */}
+      {showBusyWarning && pendingPortfolio && (
+        <div className={styles.modalOverlay} onClick={handleCancelWarning}>
+          <div className={styles.warningModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.warningIcon}>
+              <AlertTriangle size={48} />
+            </div>
+            <h3 className={styles.warningTitle}>잠깐!</h3>
+            <p className={styles.warningText}>
+              <strong>{pendingPortfolio.shopName}</strong>은(는) 현재 <strong>{getWorkloadLabel(pendingPortfolio.workload)}</strong> 상태입니다.
+              <br />
+              답변이 평소보다 오래 걸릴 수 있어요.
+            </p>
+            <div className={styles.warningButtons}>
+              <Button variant="outline" onClick={handleCancelWarning}>
+                다른 파트너 찾기
+              </Button>
+              <Button variant="primary" onClick={handleConfirmContact}>
+                그래도 문의하기
               </Button>
             </div>
           </div>

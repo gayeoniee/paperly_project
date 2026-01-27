@@ -1,6 +1,6 @@
 // Gemini API 헬퍼
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
 // 시스템 프롬프트: 종이 추천 전문가
 const SYSTEM_PROMPT = `당신은 "Paperly"의 AI 종이 추천 전문가입니다.
