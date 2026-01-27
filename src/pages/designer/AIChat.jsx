@@ -1,11 +1,85 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, ArrowLeft, Layers, Palette } from 'lucide-react';
+import { Send, Sparkles, ArrowLeft, Layers, Palette, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { askGemini } from '../../lib/gemini';
 import { searchPapersByKeywords } from '../../lib/supabase';
+import Button from '../../components/common/Button';
 import styles from './AIChat.module.css';
 
 const suggestedKeywords = ['포근한 느낌', '고급스러운', '친환경', '빈티지', '명함용'];
+
+// AI 메시지를 포맷팅하는 헬퍼 함수
+const formatAIMessage = (text) => {
+  if (!text) return null;
+
+  // 줄바꿈으로 분리
+  const lines = text.split('\n');
+  const elements = [];
+  let currentList = [];
+  let listKey = 0;
+
+  const processText = (str) => {
+    // **bold** 처리
+    const parts = str.split(/(\*\*[^*]+\*\*)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={i}>{part.slice(2, -2)}</strong>;
+      }
+      return part;
+    });
+  };
+
+  const flushList = () => {
+    if (currentList.length > 0) {
+      elements.push(
+        <ul key={`list-${listKey++}`} style={{ margin: '8px 0', paddingLeft: '0', listStyle: 'none' }}>
+          {currentList.map((item, idx) => (
+            <li key={idx} style={{ marginBottom: '6px', paddingLeft: '1.2rem', position: 'relative' }}>
+              <span style={{ position: 'absolute', left: 0, color: 'var(--color-primary)' }}>•</span>
+              {processText(item)}
+            </li>
+          ))}
+        </ul>
+      );
+      currentList = [];
+    }
+  };
+
+  lines.forEach((line, idx) => {
+    const trimmed = line.trim();
+
+    // 빈 줄
+    if (!trimmed) {
+      flushList();
+      return;
+    }
+
+    // 리스트 항목 (• 또는 - 로 시작)
+    if (trimmed.startsWith('•') || trimmed.startsWith('-')) {
+      const content = trimmed.replace(/^[•\-]\s*/, '').trim();
+      if (content) {
+        currentList.push(content);
+      }
+    } else {
+      // 일반 텍스트
+      flushList();
+      elements.push(
+        <p key={`p-${idx}`} style={{ margin: '0 0 8px 0' }}>
+          {processText(trimmed)}
+        </p>
+      );
+    }
+  });
+
+  flushList();
+
+  // 요소가 없으면 원본 텍스트 반환
+  if (elements.length === 0) {
+    return <span>{processText(text)}</span>;
+  }
+
+  return <div style={{ lineHeight: 1.6 }}>{elements}</div>;
+};
 
 // variants에서 랜덤 이미지 가져오기
 const getRandomVariantImage = (variants) => {
@@ -14,6 +88,29 @@ const getRandomVariantImage = (variants) => {
   if (variantsWithImg.length === 0) return null;
   const randomIndex = Math.floor(Math.random() * variantsWithImg.length);
   return variantsWithImg[randomIndex].paper_img;
+};
+
+// 텍스트를 리스트로 포맷팅하는 헬퍼 함수
+const formatTextWithList = (text) => {
+  if (!text) return null;
+  const items = text.split(/(?=•)|(?=-)/).map(item => item.trim()).filter(item => item);
+  if (items.length <= 1 && !text.includes('•') && !text.includes('-')) {
+    return <p>{text}</p>;
+  }
+  return (
+    <ul style={{ margin: 0, paddingLeft: '1.2rem', listStyle: 'none' }}>
+      {items.map((item, idx) => {
+        const cleanItem = item.replace(/^[•\-]\s*/, '').trim();
+        if (!cleanItem) return null;
+        return (
+          <li key={idx} style={{ marginBottom: '0.5rem', position: 'relative', paddingLeft: '1rem' }}>
+            <span style={{ position: 'absolute', left: 0 }}>•</span>
+            {cleanItem}
+          </li>
+        );
+      })}
+    </ul>
+  );
 };
 
 function PaperRecommendation({ paper, onSelect }) {
@@ -63,6 +160,8 @@ export default function AIChat() {
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [selectedPaper, setSelectedPaper] = useState(null);
+  const [selectedVariant, setSelectedVariant] = useState(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -130,12 +229,21 @@ export default function AIChat() {
   };
 
   const handlePaperSelect = (paper) => {
-    // 종이 선택 시 상세 정보 보여주기
+    setSelectedPaper(paper);
+    setSelectedVariant(paper.variants?.[0] || null);
+  };
+
+  const closePaperDetail = () => {
+    setSelectedPaper(null);
+    setSelectedVariant(null);
+  };
+
+  const handleRequestQuote = (paper) => {
+    closePaperDetail();
     const detailMessage = {
       id: Date.now(),
       type: 'ai',
-      text: `${paper.paper_name}을(를) 선택하셨네요! ${paper.feature || ''} ${paper.description || ''} 이 종이로 견적을 요청하시겠어요?`,
-      selectedPaper: paper
+      text: `**${paper.paper_name}**을(를) 선택하셨네요!\n\n이 종이로 견적을 요청하시려면 아래 정보를 알려주세요:\n- 인쇄물 종류 (명함, 브로슈어 등)\n- 수량\n- 원하는 사이즈`,
     };
     setMessages(prev => [...prev, detailMessage]);
   };
@@ -172,7 +280,7 @@ export default function AIChat() {
             )}
             <div className={styles.messageContent}>
               <div className={styles.messageBubble}>
-                {message.text}
+                {message.type === 'ai' ? formatAIMessage(message.text) : message.text}
               </div>
               {message.keywords && message.keywords.length > 0 && (
                 <div className={styles.extractedKeywords}>
@@ -182,14 +290,16 @@ export default function AIChat() {
                 </div>
               )}
               {message.papers && message.papers.length > 0 && (
-                <div className={styles.recommendations}>
-                  {message.papers.map(paper => (
-                    <PaperRecommendation
-                      key={paper.paper_name}
-                      paper={paper}
-                      onSelect={handlePaperSelect}
-                    />
-                  ))}
+                <div className={styles.recommendationsWrapper}>
+                  <div className={styles.recommendations}>
+                    {message.papers.map(paper => (
+                      <PaperRecommendation
+                        key={paper.paper_name}
+                        paper={paper}
+                        onSelect={handlePaperSelect}
+                      />
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -244,6 +354,118 @@ export default function AIChat() {
           <Send size={20} />
         </button>
       </div>
+
+      {/* Paper Detail Modal */}
+      {selectedPaper && (
+        <div className={styles.modalOverlay} onClick={closePaperDetail}>
+          <div className={styles.paperModal} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.closeBtn} onClick={closePaperDetail}>
+              <X size={24} />
+            </button>
+
+            <div className={styles.paperModalContent}>
+              {/* 종이 이미지 */}
+              <div className={styles.paperModalImage}>
+                {selectedVariant?.paper_img ? (
+                  <img src={selectedVariant.paper_img} alt={selectedVariant.paper_name} />
+                ) : (
+                  <div className={styles.paperModalPlaceholder}>
+                    <Layers size={48} />
+                  </div>
+                )}
+              </div>
+
+              {/* 종이 정보 */}
+              <div className={styles.paperModalInfo}>
+                <h2 className={styles.paperModalTitle}>{selectedPaper.paper_name}</h2>
+
+                {selectedPaper.tags && (
+                  <div className={styles.paperModalTags}>
+                    {selectedPaper.tags.split(',').map((tag, i) => (
+                      <span key={i} className={styles.tag}>#{tag.trim()}</span>
+                    ))}
+                  </div>
+                )}
+
+                {selectedPaper.description && (
+                  <div className={styles.paperDetailSection}>
+                    <h3>설명</h3>
+                    {formatTextWithList(selectedPaper.description)}
+                  </div>
+                )}
+
+                {selectedPaper.feature && (
+                  <div className={styles.paperDetailSection}>
+                    <h3>특징</h3>
+                    {formatTextWithList(selectedPaper.feature)}
+                  </div>
+                )}
+
+                {/* Variants 선택 */}
+                {selectedPaper.variants && selectedPaper.variants.length > 0 && (
+                  <div className={styles.paperDetailSection}>
+                    <h3>옵션 선택</h3>
+                    <div className={styles.variantList}>
+                      {selectedPaper.variants.map((variant) => (
+                        <button
+                          key={variant.paper_code}
+                          className={`${styles.variantBtn} ${
+                            selectedVariant?.paper_code === variant.paper_code ? styles.active : ''
+                          }`}
+                          onClick={() => setSelectedVariant(variant)}
+                        >
+                          {variant.paper_img && (
+                            <img src={variant.paper_img} alt={variant.color} />
+                          )}
+                          <div className={styles.variantInfo}>
+                            <span className={styles.variantColor}>{variant.color || '기본'}</span>
+                            {variant.gsm && <span className={styles.variantGsm}>{variant.gsm}</span>}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 선택된 Variant 상세 정보 */}
+                {selectedVariant && (
+                  <div className={styles.selectedVariantInfo}>
+                    <div className={styles.variantSpec}>
+                      {selectedVariant.color && (
+                        <div className={styles.specItem}>
+                          <span className={styles.specLabel}>색상</span>
+                          <span className={styles.specValue}>{selectedVariant.color}</span>
+                        </div>
+                      )}
+                      {selectedVariant.gsm && (
+                        <div className={styles.specItem}>
+                          <span className={styles.specLabel}>평량</span>
+                          <span className={styles.specValue}>{selectedVariant.gsm}</span>
+                        </div>
+                      )}
+                      {selectedVariant.standard && (
+                        <div className={styles.specItem}>
+                          <span className={styles.specLabel}>규격</span>
+                          <span className={styles.specValue}>{selectedVariant.standard}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className={styles.modalFooter}>
+              <Button variant="secondary" onClick={closePaperDetail}>
+                닫기
+              </Button>
+              <Button variant="primary" onClick={() => handleRequestQuote(selectedPaper)}>
+                이 종이로 견적 요청
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

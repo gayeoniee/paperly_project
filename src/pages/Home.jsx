@@ -15,6 +15,35 @@ const getRandomVariantImage = (variants) => {
   const randomIndex = Math.floor(Math.random() * variantsWithImg.length);
   return variantsWithImg[randomIndex].paper_img;
 };
+
+// 텍스트를 리스트로 포맷팅하는 헬퍼 함수
+const formatTextWithList = (text) => {
+  if (!text) return null;
+
+  // "•" 또는 "-"로 시작하는 항목들을 분리
+  const items = text.split(/(?=•)|(?=-)/).map(item => item.trim()).filter(item => item);
+
+  // 리스트 형식이 아닌 경우 그냥 텍스트로 반환
+  if (items.length <= 1 && !text.includes('•') && !text.includes('-')) {
+    return <p>{text}</p>;
+  }
+
+  return (
+    <ul style={{ margin: 0, paddingLeft: '1.2rem', listStyle: 'none' }}>
+      {items.map((item, idx) => {
+        // 앞의 "•" 또는 "-" 제거
+        const cleanItem = item.replace(/^[•\-]\s*/, '').trim();
+        if (!cleanItem) return null;
+        return (
+          <li key={idx} style={{ marginBottom: '0.5rem', position: 'relative', paddingLeft: '1rem' }}>
+            <span style={{ position: 'absolute', left: 0 }}>•</span>
+            {cleanItem}
+          </li>
+        );
+      })}
+    </ul>
+  );
+};
 import Button from '../components/common/Button';
 import Card from '../components/common/Card';
 import { fetchPapers } from '../lib/supabase';
@@ -622,21 +651,21 @@ export default function Home() {
                 {selectedPaper.description && (
                   <div className={styles.paperDetailSection}>
                     <h3>설명</h3>
-                    <p>{selectedPaper.description}</p>
+                    {formatTextWithList(selectedPaper.description)}
                   </div>
                 )}
 
                 {selectedPaper.feature && (
                   <div className={styles.paperDetailSection}>
                     <h3>특징</h3>
-                    <p>{selectedPaper.feature}</p>
+                    {formatTextWithList(selectedPaper.feature)}
                   </div>
                 )}
 
                 {selectedPaper.pattern && (
                   <div className={styles.paperDetailSection}>
                     <h3>패턴</h3>
-                    <p>{selectedPaper.pattern}</p>
+                    {formatTextWithList(selectedPaper.pattern)}
                   </div>
                 )}
 
@@ -695,7 +724,7 @@ export default function Home() {
                 {selectedPaper.etc && (
                   <div className={styles.paperDetailSection}>
                     <h3>기타 정보</h3>
-                    <p>{selectedPaper.etc}</p>
+                    {formatTextWithList(selectedPaper.etc)}
                   </div>
                 )}
               </div>

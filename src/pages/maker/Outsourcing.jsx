@@ -12,11 +12,25 @@ const activeRequests = [
 ];
 
 const partners = [
-  { name: '대현기획', category: '인쇄 기획', tags: ['북디자인', '편집'], rating: 4.9 },
-  { name: '정밀형압', category: '후가공', tags: ['형압', '박'], rating: 5.0 },
-  { name: '서진제본', category: '제본', tags: ['양장', '무선'], rating: 4.8 },
-  { name: '삼화특수지', category: '용지공급', tags: ['특수지', '친환경'], rating: 4.7 },
+  { name: '대현기획', category: '인쇄 기획', tags: ['북디자인', '편집'], rating: 4.9, workload: 'RELAXED' },
+  { name: '정밀형압', category: '후가공', tags: ['형압', '박'], rating: 5.0, workload: 'BUSY' },
+  { name: '서진제본', category: '제본', tags: ['양장', '무선'], rating: 4.8, workload: 'NORMAL' },
+  { name: '삼화특수지', category: '용지공급', tags: ['특수지', '친환경'], rating: 4.7, workload: 'RELAXED' },
 ];
+
+// workload 상태 UI
+const getWorkloadUI = (status) => {
+  switch (status) {
+    case 'RELAXED':
+      return { label: '여유', className: styles.workloadRelaxed };
+    case 'NORMAL':
+      return { label: '보통', className: styles.workloadNormal };
+    case 'BUSY':
+      return { label: '분주', className: styles.workloadBusy };
+    default:
+      return { label: '확인불가', className: styles.workloadUnknown };
+  }
+};
 
 const pendingRequests = [
   { from: '을지로 디자인', item: '도록 인쇄', dday: 'D-3' },
@@ -85,26 +99,35 @@ export default function Outsourcing() {
               파트너 마켓플레이스
             </h2>
             <div className={styles.partnerGrid}>
-              {partners.map((partner, i) => (
-                <Card key={i} className={styles.partnerCard}>
-                  <div className={styles.partnerHeader}>
-                    <span className={styles.partnerCategory}>{partner.category}</span>
-                    <span className={styles.partnerRating}>
-                      <Star size={12} fill="currentColor" />
-                      {partner.rating}
-                    </span>
-                  </div>
-                  <h3 className={styles.partnerName}>{partner.name}</h3>
-                  <div className={styles.partnerTags}>
-                    {partner.tags.map(tag => (
-                      <span key={tag} className={styles.tag}>#{tag}</span>
-                    ))}
-                  </div>
-                  <button className={styles.contactBtn}>
-                    문의하기 <ArrowRight size={14} />
-                  </button>
-                </Card>
-              ))}
+              {partners.map((partner, i) => {
+                const workload = getWorkloadUI(partner.workload);
+                return (
+                  <Card key={i} className={styles.partnerCard}>
+                    <div className={styles.partnerHeader}>
+                      <span className={styles.partnerCategory}>{partner.category}</span>
+                      <span className={styles.partnerRating}>
+                        <Star size={12} fill="currentColor" />
+                        {partner.rating}
+                      </span>
+                    </div>
+                    <h3 className={styles.partnerName}>{partner.name}</h3>
+                    <div className={styles.partnerTags}>
+                      {partner.tags.map(tag => (
+                        <span key={tag} className={styles.tag}>#{tag}</span>
+                      ))}
+                    </div>
+                    <div className={styles.partnerFooter}>
+                      <button className={styles.contactBtn}>
+                        문의하기 <ArrowRight size={14} />
+                      </button>
+                      <div className={`${styles.workloadBadge} ${workload.className}`}>
+                        <span className={styles.workloadDot}></span>
+                        <span>{workload.label}</span>
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })}
             </div>
           </section>
         </div>
