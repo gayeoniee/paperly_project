@@ -19,7 +19,8 @@ const portfolios = [
     location: '서울 성동구',
     rating: 4.9,
     experience: '30년',
-    works: ['명함', '청첩장', '브로슈어']
+    works: ['명함', '청첩장', '브로슈어'],
+    workload: 'RELAXED'
   },
   {
     id: 2,
@@ -28,7 +29,8 @@ const portfolios = [
     location: '서울 마포구',
     rating: 4.8,
     experience: '15년',
-    works: ['포스터', '현수막', '배너']
+    works: ['포스터', '현수막', '배너'],
+    workload: 'BUSY'
   },
   {
     id: 3,
@@ -37,7 +39,8 @@ const portfolios = [
     location: '서울 종로구',
     rating: 4.9,
     experience: '25년',
-    works: ['아트북', '화집', '도록']
+    works: ['아트북', '화집', '도록'],
+    workload: 'NORMAL'
   },
   {
     id: 4,
@@ -46,9 +49,24 @@ const portfolios = [
     location: '경기 성남시',
     rating: 4.7,
     experience: '10년',
-    works: ['리플렛', '카탈로그', '패키지']
+    works: ['리플렛', '카탈로그', '패키지'],
+    workload: 'RELAXED'
   }
 ];
+
+// workload 상태 UI
+const getWorkloadUI = (status) => {
+  switch (status) {
+    case 'RELAXED':
+      return { label: '여유', color: styles.relaxed };
+    case 'NORMAL':
+      return { label: '보통', color: styles.normal };
+    case 'BUSY':
+      return { label: '분주', color: styles.busy };
+    default:
+      return { label: '확인불가', color: styles.unknown };
+  }
+};
 
 // variants에서 랜덤 이미지 가져오기
 const getRandomVariantImage = (variants) => {
@@ -279,39 +297,46 @@ export default function Home() {
             <ChevronLeft size={24} />
           </button>
           <div className={styles.portfolioScroll} ref={portfolioScrollRef}>
-            {portfolios.map((portfolio) => (
-              <div
-                key={portfolio.id}
-                className={styles.portfolioCard}
-                // onClick={() => openDetail(portfolio)}
-              >
-                <div className={styles.portfolioAvatar}>
-                  <User size={32} strokeWidth={1.5} />
-                </div>
-                <div className={styles.portfolioContent}>
-                  <div className={styles.portfolioHeader}>
-                    <h3 className={styles.shopName}>{portfolio.shopName}</h3>
-                    <div className={styles.rating}>
-                      <Star size={12} fill="currentColor" />
-                      {portfolio.rating}
+            {portfolios.map((portfolio) => {
+              const workload = getWorkloadUI(portfolio.workload);
+              return (
+                <div
+                  key={portfolio.id}
+                  className={styles.portfolioCard}
+                  // onClick={() => openDetail(portfolio)}
+                >
+                  <div className={styles.portfolioAvatar}>
+                    <User size={32} strokeWidth={1.5} />
+                  </div>
+                  <div className={styles.portfolioContent}>
+                    <div className={styles.portfolioHeader}>
+                      <h3 className={styles.shopName}>{portfolio.shopName}</h3>
+                      <div className={styles.rating}>
+                        <Star size={12} fill="currentColor" />
+                        {portfolio.rating}
+                      </div>
+                    </div>
+                    <p className={styles.specialty}>{portfolio.specialty}</p>
+                    <div className={styles.portfolioMeta}>
+                      <span className={styles.location}>
+                        <MapPin size={12} />
+                        {portfolio.location}
+                      </span>
+                      <span className={styles.experience}>{portfolio.experience} 경력</span>
+                    </div>
+                    <div className={styles.works}>
+                      {portfolio.works.map((work) => (
+                        <span key={work} className={styles.workTag}>{work}</span>
+                      ))}
                     </div>
                   </div>
-                  <p className={styles.specialty}>{portfolio.specialty}</p>
-                  <div className={styles.portfolioMeta}>
-                    <span className={styles.location}>
-                      <MapPin size={12} />
-                      {portfolio.location}
-                    </span>
-                    <span className={styles.experience}>{portfolio.experience} 경력</span>
-                  </div>
-                  <div className={styles.works}>
-                    {portfolio.works.map((work) => (
-                      <span key={work} className={styles.workTag}>{work}</span>
-                    ))}
+                  <div className={`${styles.workloadIndicator} ${workload.color}`}>
+                    <span className={styles.workloadDot}></span>
+                    <span>{workload.label}</span>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           <button
             className={`${styles.scrollBtn} ${styles.scrollRight}`}
