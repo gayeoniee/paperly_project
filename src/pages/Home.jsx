@@ -145,6 +145,13 @@ const getWorkloadUI = (status) => {
   };
 
 
+// 배너 이미지 데이터
+const bannerImages = [
+  { src: '/banners/banner1.png', alt: 'PAPERLY 사용자 후기 - ARIEL 사장님, ZACH 과장님' },
+  { src: '/banners/banner2.png', alt: 'PAPERLY 서비스 소개 - 종이와 관련된 다양한 서비스' },
+  { src: '/banners/banner3.png', alt: 'PAPERLY - 종이와 가치를 연결합니다' },
+];
+
 export default function Home() {
   const navigate = useNavigate();
   const [selectedPortfolio, setSelectedPortfolio] = useState(null);
@@ -153,6 +160,7 @@ export default function Home() {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [loadingPapers, setLoadingPapers] = useState(true);
   const [zoomedImage, setZoomedImage] = useState(null);
+  const [currentBanner, setCurrentBanner] = useState(0);
   const paperScrollRef = useRef(null);
   const portfolioScrollRef = useRef(null);
 
@@ -169,6 +177,15 @@ export default function Home() {
       }
     }
     loadPapers();
+  }, []);
+
+  // 배너 자동 슬라이드
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentBanner(prev => (prev + 1) % bannerImages.length);
+    }, 5000); // 5초마다 변경
+
+    return () => clearInterval(timer);
   }, []);
 
   // 종이 스크롤 함수
@@ -230,36 +247,50 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Hero */}
-      <section className={styles.hero}>
-        <div className={styles.heroContent}>
-          <h2 className={styles.heroTitle}>
-            <span className={styles.highlight}>종이</span>가 전하는<br />
-            따뜻한 이야기
-          </h2>
-          <p className={styles.heroDesc}>
-            디지털 시대에도 변하지 않는 가치,<br />
-            장인의 손끝에서 완성되는 인쇄의 감동을 만나보세요.
-          </p>
+      {/* Hero Banner */}
+      <section className={styles.heroBanner}>
+        <div className={styles.bannerSlider}>
+          {bannerImages.map((banner, idx) => (
+            <div
+              key={idx}
+              className={`${styles.bannerSlide} ${currentBanner === idx ? styles.active : ''}`}
+            >
+              <img
+                src={banner.src}
+                alt={banner.alt}
+                className={styles.bannerImage}
+              />
+            </div>
+          ))}
         </div>
 
-        <div className={styles.paperAnimation}>
-          <div className={styles.floatingPapers}>
-            {paperTypes.map((paper, i) => (
-              <div
-                key={paper.name}
-                className={styles.paperChip}
-                style={{
-                  backgroundColor: paper.bg,
-                  animationDelay: `${i * 0.2}s`
-                }}
-              >
-                <span className={styles.paperName}>{paper.name}</span>
-                <span className={styles.paperDesc}>{paper.desc}</span>
-              </div>
-            ))}
-          </div>
+        {/* Banner Indicators */}
+        <div className={styles.bannerIndicators}>
+          {bannerImages.map((_, idx) => (
+            <button
+              key={idx}
+              className={`${styles.bannerDot} ${currentBanner === idx ? styles.active : ''}`}
+              onClick={() => setCurrentBanner(idx)}
+              aria-label={`배너 ${idx + 1}`}
+            />
+          ))}
         </div>
+
+        {/* Banner Navigation */}
+        <button
+          className={`${styles.bannerNav} ${styles.bannerPrev}`}
+          onClick={() => setCurrentBanner(prev => prev === 0 ? bannerImages.length - 1 : prev - 1)}
+          aria-label="이전 배너"
+        >
+          <ChevronLeft size={24} />
+        </button>
+        <button
+          className={`${styles.bannerNav} ${styles.bannerNext}`}
+          onClick={() => setCurrentBanner(prev => prev === bannerImages.length - 1 ? 0 : prev + 1)}
+          aria-label="다음 배너"
+        >
+          <ChevronRight size={24} />
+        </button>
       </section>
 
       {/* Paper Section */}
@@ -513,7 +544,7 @@ export default function Home() {
           icon={ArrowRight}
           onClick={() => navigate('/login')}
         >
-          로그인하기
+          무료로 시작하기
         </Button>
       </section>
 
@@ -667,17 +698,17 @@ export default function Home() {
                   </div>
                 )}
 
-                {selectedPaper.description && (
+                {selectedPaper.display_description && (
                   <div className={styles.paperDetailSection}>
                     <h3>설명</h3>
-                    {formatTextWithList(selectedPaper.description)}
+                    <div dangerouslySetInnerHTML={{ __html: selectedPaper.display_description }} />
                   </div>
                 )}
 
-                {selectedPaper.feature && (
+                {selectedPaper.display_feature && (
                   <div className={styles.paperDetailSection}>
                     <h3>특징</h3>
-                    {formatTextWithList(selectedPaper.feature)}
+                    <div dangerouslySetInnerHTML={{ __html: selectedPaper.display_feature }} />
                   </div>
                 )}
 
@@ -740,10 +771,10 @@ export default function Home() {
                   </div>
                 )}
 
-                {selectedPaper.etc && (
+                {selectedPaper.display_etc && (
                   <div className={styles.paperDetailSection}>
                     <h3>기타 정보</h3>
-                    {formatTextWithList(selectedPaper.etc)}
+                    <div dangerouslySetInnerHTML={{ __html: selectedPaper.display_etc }} />
                   </div>
                 )}
               </div>

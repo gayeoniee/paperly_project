@@ -722,17 +722,17 @@ export default function AIChat() {
                   </div>
                 )}
 
-                {selectedPaper.description && (
+                {selectedPaper.display_description && (
                   <div className={styles.paperDetailSection}>
                     <h3>설명</h3>
-                    {formatTextWithList(selectedPaper.description)}
+                    <div dangerouslySetInnerHTML={{ __html: selectedPaper.display_description }} />
                   </div>
                 )}
 
-                {selectedPaper.feature && (
+                {selectedPaper.display_feature && (
                   <div className={styles.paperDetailSection}>
                     <h3>특징</h3>
-                    {formatTextWithList(selectedPaper.feature)}
+                    <div dangerouslySetInnerHTML={{ __html: selectedPaper.display_feature }} />
                   </div>
                 )}
 
