@@ -4,7 +4,8 @@ import {
   Star, MapPin, ChevronRight, X,
   ArrowRight, Bell, Phone, Clock, Award,
   ChevronLeft, Layers, Palette, FileText, Sparkles, User,
-  HeartHandshake, Users, Package, ZoomIn
+  HeartHandshake, Users, Package, ZoomIn, HelpCircle, MessageCircle,
+  ChevronDown, ChevronUp, Send
 } from 'lucide-react';
 
 // variants에서 랜덤 이미지 가져오기
@@ -161,6 +162,11 @@ export default function Home() {
   const [loadingPapers, setLoadingPapers] = useState(true);
   const [zoomedImage, setZoomedImage] = useState(null);
   const [currentBanner, setCurrentBanner] = useState(0);
+  const [showCustomerService, setShowCustomerService] = useState(false);
+  const [showInquiryModal, setShowInquiryModal] = useState(false);
+  const [inquiryTitle, setInquiryTitle] = useState('');
+  const [inquiryContent, setInquiryContent] = useState('');
+  const [expandedFaq, setExpandedFaq] = useState(null);
   const paperScrollRef = useRef(null);
   const portfolioScrollRef = useRef(null);
 
@@ -546,6 +552,14 @@ export default function Home() {
         >
           무료로 시작하기
         </Button>
+        <br></br>
+        <button
+          className={styles.customerServiceBtn}
+          onClick={() => setShowCustomerService(true)}
+        >
+          <HelpCircle size={18} />
+          고객센터
+        </button>
       </section>
 
       {/* Footer */}
@@ -801,6 +815,141 @@ export default function Home() {
           <div className={styles.zoomContainer}>
             <img src={zoomedImage} alt="확대 이미지" className={styles.zoomedImage} />
             <p className={styles.zoomHint}>클릭하여 닫기</p>
+          </div>
+        </div>
+      )}
+
+      {/* 고객센터 모달 */}
+      {showCustomerService && (
+        <div className={styles.modalOverlay} onClick={() => setShowCustomerService(false)}>
+          <div className={styles.customerServiceModal} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.closeBtn} onClick={() => setShowCustomerService(false)}>
+              <X size={24} />
+            </button>
+
+            <div className={styles.customerServiceHeader}>
+              <HelpCircle size={32} />
+              <h2>고객센터</h2>
+              <p>무엇을 도와드릴까요?</p>
+            </div>
+
+            <div className={styles.customerServiceBody}>
+              {/* FAQ 섹션 */}
+              <div className={styles.faqSection}>
+                <h3>자주 묻는 질문</h3>
+
+                {/* 사용자 FAQ */}
+                <div className={styles.faqCategory}>
+                  <h4>사용자</h4>
+                  {[
+                    { q: '종이 추천은 어떻게 받나요?', a: 'AI 채팅을 통해 원하는 느낌이나 용도를 말씀해주시면 맞춤 종이를 추천해드립니다. 홈 화면의 "AI 종이 추천" 배너를 클릭해보세요!' },
+                    { q: '견적 요청은 어떻게 하나요?', a: '원하는 종이를 선택한 후 "견적 요청" 버튼을 클릭하고, 품명/수량/사이즈 등을 입력하시면 인쇄소 사장님들께 견적이 전달됩니다.' },
+                    { q: '결제는 어떻게 이루어지나요?', a: 'Paperly는 매칭 플랫폼으로, 결제는 선택하신 인쇄소와 직접 진행하시면 됩니다. 견적 확정 후 인쇄소에서 안내드립니다.' },
+                  ].map((faq, idx) => (
+                    <div key={`user-${idx}`} className={styles.faqItem}>
+                      <button
+                        className={`${styles.faqQuestion} ${expandedFaq === `user-${idx}` ? styles.expanded : ''}`}
+                        onClick={() => setExpandedFaq(expandedFaq === `user-${idx}` ? null : `user-${idx}`)}
+                      >
+                        <span>{faq.q}</span>
+                        {expandedFaq === `user-${idx}` ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                      </button>
+                      {expandedFaq === `user-${idx}` && (
+                        <div className={styles.faqAnswer}>{faq.a}</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* 사장님 FAQ */}
+                <div className={styles.faqCategory}>
+                  <h4>인쇄소 사장님</h4>
+                  {[
+                    { q: '파트너 등록은 어떻게 하나요?', a: '사장님 로그인 후 "파트너 등록" 메뉴에서 인쇄소 정보와 전문 분야를 입력하시면 검토 후 승인됩니다. 보통 1-2 영업일 소요됩니다.' },
+                    { q: '견적 요청은 어떻게 받나요?', a: '등록하신 전문 분야와 매칭되는 견적 요청이 들어오면 알림을 통해 안내드립니다. 대시보드에서 요청 내역을 확인하고 견적을 보내실 수 있습니다.' },
+                    { q: '수수료 정책이 어떻게 되나요?', a: '현재 베타 기간 중으로 매칭 수수료는 무료입니다. 정식 오픈 후에도 합리적인 수수료 정책을 운영할 예정입니다.' },
+                  ].map((faq, idx) => (
+                    <div key={`maker-${idx}`} className={styles.faqItem}>
+                      <button
+                        className={`${styles.faqQuestion} ${expandedFaq === `maker-${idx}` ? styles.expanded : ''}`}
+                        onClick={() => setExpandedFaq(expandedFaq === `maker-${idx}` ? null : `maker-${idx}`)}
+                      >
+                        <span>{faq.q}</span>
+                        {expandedFaq === `maker-${idx}` ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                      </button>
+                      {expandedFaq === `maker-${idx}` && (
+                        <div className={styles.faqAnswer}>{faq.a}</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 1:1 문의 버튼 */}
+              <button
+                className={styles.inquiryBtn}
+                onClick={() => setShowInquiryModal(true)}
+              >
+                <MessageCircle size={20} />
+                1:1 문의하기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 1:1 문의 모달 */}
+      {showInquiryModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowInquiryModal(false)}>
+          <div className={styles.inquiryModal} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.closeBtn} onClick={() => setShowInquiryModal(false)}>
+              <X size={24} />
+            </button>
+
+            <div className={styles.inquiryHeader}>
+              <MessageCircle size={28} />
+              <h2>1:1 문의하기</h2>
+            </div>
+
+            <div className={styles.inquiryBody}>
+              <div className={styles.inputGroup}>
+                <label>제목</label>
+                <input
+                  type="text"
+                  placeholder="문의 제목을 입력해주세요"
+                  value={inquiryTitle}
+                  onChange={(e) => setInquiryTitle(e.target.value)}
+                />
+              </div>
+              <div className={styles.inputGroup}>
+                <label>내용</label>
+                <textarea
+                  placeholder="문의 내용을 자세히 작성해주세요"
+                  rows={6}
+                  value={inquiryContent}
+                  onChange={(e) => setInquiryContent(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className={styles.inquiryFooter}>
+              <Button variant="secondary" onClick={() => setShowInquiryModal(false)}>
+                취소
+              </Button>
+              <Button
+                variant="primary"
+                icon={Send}
+                onClick={() => {
+                  alert('문의가 접수되었습니다. 빠른 시일 내에 답변드리겠습니다.');
+                  setInquiryTitle('');
+                  setInquiryContent('');
+                  setShowInquiryModal(false);
+                }}
+                disabled={!inquiryTitle.trim() || !inquiryContent.trim()}
+              >
+                보내기
+              </Button>
+            </div>
           </div>
         </div>
       )}

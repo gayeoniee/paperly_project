@@ -298,3 +298,310 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Header Actions */
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-background-paper);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  color: var(--color-text-light);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.actionBtn:hover {
+  background: var(--color-accent-warm);
+  border-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+/* Modal Overlay */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--space-md);
+}
+
+.closeBtn {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  background: var(--color-background);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  z-index: 10;
+}
+
+.closeBtn:hover {
+  background: var(--color-accent);
+  color: var(--color-text);
+}
+
+/* Customer Service Modal */
+.customerServiceModal {
+  background: var(--color-background-paper);
+  border-radius: var(--radius-xl);
+  max-width: 560px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: var(--shadow-xl);
+}
+
+.customerServiceHeader {
+  text-align: center;
+  padding: var(--space-2xl) var(--space-xl) var(--space-lg);
+  background: linear-gradient(135deg, var(--color-accent-warm), var(--color-accent));
+}
+
+.customerServiceHeader svg {
+  color: var(--color-primary);
+}
+
+.customerServiceHeader h2 {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-2xl);
+  color: var(--color-text);
+  margin: var(--space-sm) 0 var(--space-xs) 0;
+}
+
+.customerServiceHeader p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+  margin: 0;
+}
+
+.customerServiceBody {
+  padding: var(--space-xl);
+}
+
+/* FAQ Section */
+.faqSection {
+  margin-bottom: var(--space-xl);
+}
+
+.faqSection > h3 {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+  margin: 0 0 var(--space-lg) 0;
+}
+
+.faqCategory {
+  margin-bottom: var(--space-lg);
+}
+
+.faqCategory h4 {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-primary);
+  margin: 0 0 var(--space-sm) 0;
+  padding-bottom: var(--space-xs);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.faqItem {
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-sm);
+  overflow: hidden;
+}
+
+.faqQuestion {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md);
+  background: var(--color-background);
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  text-align: left;
+  transition: all var(--transition-fast);
+}
+
+.faqQuestion:hover {
+  background: var(--color-accent-warm);
+}
+
+.faqQuestion.expanded {
+  background: var(--color-accent-warm);
+  font-weight: 500;
+}
+
+.faqQuestion svg {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.faqAnswer {
+  padding: var(--space-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+  line-height: 1.7;
+  background: var(--color-background-paper);
+  border-top: 1px solid var(--color-border-light);
+}
+
+/* Inquiry Button */
+.inquiryBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-lg);
+  color: white;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.inquiryBtn:hover {
+  background: var(--color-primary-dark);
+}
+
+/* Inquiry Modal */
+.inquiryModal {
+  background: var(--color-background-paper);
+  border-radius: var(--radius-xl);
+  max-width: 480px;
+  width: 100%;
+  position: relative;
+  box-shadow: var(--shadow-xl);
+}
+
+.inquiryHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xl);
+  background: linear-gradient(135deg, var(--color-accent-warm), var(--color-accent));
+}
+
+.inquiryHeader svg {
+  color: var(--color-primary);
+}
+
+.inquiryHeader h2 {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xl);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.inquiryBody {
+  padding: var(--space-xl);
+}
+
+.inputGroup {
+  margin-bottom: var(--space-lg);
+}
+
+.inputGroup label {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text);
+  margin-bottom: var(--space-xs);
+}
+
+.inputGroup input,
+.inputGroup textarea {
+  width: 100%;
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  background: var(--color-background);
+  transition: all var(--transition-fast);
+  resize: vertical;
+}
+
+.inputGroup input:focus,
+.inputGroup textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(139, 90, 43, 0.1);
+}
+
+.inputGroup input::placeholder,
+.inputGroup textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+.inquiryFooter {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-xl);
+  border-top: 1px solid var(--color-border-light);
+  background: var(--color-background);
+}
+
+.inquiryFooter button {
+  flex: 1;
+}
+
+/* Mobile Responsive for Customer Service */
+@media (max-width: 768px) {
+  .headerActions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 600px) {
+  .customerServiceModal,
+  .inquiryModal {
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .customerServiceHeader {
+    padding-top: var(--space-3xl);
+  }
+
+  .inquiryHeader {
+    padding-top: var(--space-3xl);
+  }
+
+  .actionBtn span {
+    display: none;
+  }
+}
