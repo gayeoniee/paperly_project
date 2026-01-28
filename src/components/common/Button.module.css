@@ -1,0 +1,98 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  font-family: var(--font-body);
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  border: none;
+  white-space: nowrap;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Variants */
+.primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.secondary {
+  background: var(--color-secondary);
+  color: var(--color-text);
+}
+
+.secondary:hover:not(:disabled) {
+  background: var(--color-secondary-dark);
+  color: white;
+}
+
+.outline {
+  background: transparent;
+  color: var(--color-primary);
+  border: 1.5px solid var(--color-primary);
+}
+
+.outline:hover:not(:disabled) {
+  background: var(--color-primary);
+  color: white;
+}
+
+.ghost {
+  background: transparent;
+  color: var(--color-text);
+}
+
+.ghost:hover:not(:disabled) {
+  background: var(--color-accent);
+}
+
+.accent {
+  background: var(--color-accent-warm);
+  color: var(--color-primary-dark);
+}
+
+.accent:hover:not(:disabled) {
+  background: var(--color-accent);
+}
+
+/* Sizes */
+.small {
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--font-size-sm);
+  height: 32px;
+}
+
+.medium {
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-base);
+  height: 42px;
+}
+
+.large {
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--font-size-lg);
+  height: 52px;
+}
+
+/* Full Width */
+.fullWidth {
+  width: 100%;
+}
+
+/* Icon */
+.icon {
+  flex-shrink: 0;
+}

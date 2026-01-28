@@ -1,0 +1,109 @@
+ {activeTab === 'OUTSOURCING' && (
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-12 flex justify-between items-end">
+              <div>
+                <h2 className="font-headline text-5xl uppercase tracking-tighter mb-4">의뢰 및 협업</h2>
+                <p className="text-neutral font-serif text-lg italic">기획, 인쇄, 후가공 등 전문 파트너와 연결됩니다.</p>
+              </div>
+              <button className="bg-accent text-white px-8 py-3 text-xs font-bold tracking-widest uppercase hover:bg-secondary transition-all">
+                신규 의뢰 등록
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+              <div className="lg:col-span-2 space-y-12">
+                <section>
+                  <h3 className="font-headline text-xl mb-6 flex items-center gap-2">
+                    <span className="text-neutral text-sm">01</span> 진행 중인 의뢰 내역
+                  </h3>
+                  <div className="space-y-4">
+                    {[
+                      { id: 'OS-2024-11', type: '후가공(박)', partner: '대원박공사', progress: 45, status: '공정 진행 중' },
+                      { id: 'OS-2024-12', type: '기획/디자인', partner: '스튜디오 모노', progress: 10, status: '자료 검토' },
+                      { id: 'OS-2024-13', type: '지류 소싱', partner: '한솔지기', progress: 100, status: '입고 완료' },
+                    ].map((item) => (
+                      <div key={item.id} className="bg-white border border-accent/5 p-6 hover:shadow-lg transition-all group">
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <span className="text-[10px] font-bold text-neutral tracking-widest uppercase">{item.id}</span>
+                            <h4 className="text-lg font-bold mt-1">{item.type} <span className="text-neutral mx-2">|</span> {item.partner}</h4>
+                          </div>
+                          <span className="text-xs font-bold border border-accent px-3 py-1">{item.status}</span>
+                        </div>
+                        <div className="w-full h-1 bg-primary relative overflow-hidden">
+                          <div className="absolute top-0 left-0 h-full bg-secondary transition-all duration-1000" style={{ width: `${item.progress}%` }}></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section>
+                  <h3 className="font-headline text-xl mb-6 flex items-center gap-2">
+                    <span className="text-neutral text-sm">02</span> 파트너 마켓플레이스
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {[
+                      { name: '대현기획', category: '인쇄 기획', tags: ['북디자인', '편집'], rating: '4.9' },
+                      { name: '정밀형압', category: '후가공', tags: ['형압', '박'], rating: '5.0' },
+                      { name: '서진제본', category: '제본', tags: ['양장', '무선'], rating: '4.8' },
+                      { name: '삼화특수지', category: '용지공급', tags: ['특수지', '친환경'], rating: '4.7' },
+                    ].map((partner, i) => (
+                      <div key={i} className="bg-white border-l-4 border-l-accent p-6 hover:bg-primary/30 transition-all cursor-pointer">
+                        <div className="flex justify-between items-start">
+                          <span className="text-[10px] font-bold text-secondary tracking-widest uppercase">{partner.category}</span>
+                          <span className="text-xs font-headline">★ {partner.rating}</span>
+                        </div>
+                        <h4 className="text-xl font-headline tracking-tighter my-3 uppercase">{partner.name}</h4>
+                        <div className="flex gap-2">
+                          {partner.tags.map(tag => (
+                            <span key={tag} className="text-[10px] bg-accent/5 text-neutral px-2 py-0.5">#{tag}</span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </div>
+
+              <div className="lg:col-span-1 space-y-12">
+                <div className="bg-accent text-primary p-10">
+                  <h3 className="font-headline text-2xl tracking-tighter mb-6">받은 의뢰<br/>대기 목록</h3>
+                  <div className="space-y-6">
+                    {[
+                      { from: '을지로 디자인', item: '도록 인쇄', dday: 'D-3' },
+                      { from: '그린 팩토리', item: '에코백 제작', dday: 'D-12' },
+                    ].map((req, i) => (
+                      <div key={i} className="border-b border-primary/20 pb-4 last:border-0">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-sm font-bold">{req.from}</span>
+                          <span className="text-xs bg-white text-accent px-2 py-0.5 font-bold">{req.dday}</span>
+                        </div>
+                        <p className="text-xs text-primary/60 font-serif">{req.item}</p>
+                        <button className="mt-4 text-[10px] uppercase font-bold tracking-widest border-b border-primary pb-1">의뢰 확인하기</button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="border border-accent p-8">
+                  <h4 className="font-headline text-lg mb-4">협업 통계</h4>
+                  <div className="space-y-4 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-neutral uppercase">이번 달 의뢰</span>
+                      <span className="font-bold">12건</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-neutral uppercase">매칭 성공률</span>
+                      <span className="font-bold">92%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-neutral uppercase">신규 파트너</span>
+                      <span className="font-bold">3곳</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}

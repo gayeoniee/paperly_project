@@ -1,0 +1,21 @@
+ const getWorkloadUI = (status: WorkloadStatus) => {
+    switch (status) {
+      case 'RELAXED':
+        return { label: '여유', color: 'bg-green-500', text: 'text-green-600' };
+      case 'NORMAL':
+        return { label: '보통', color: 'bg-amber-500', text: 'text-amber-600' };
+      case 'BUSY':
+        return { label: '분주', color: 'bg-red-500', text: 'text-red-600' };
+      default:
+        return { label: '확인불가', color: 'bg-neutral', text: 'text-neutral' };
+    }
+  };
+
+  const partners: Partner[] = [
+    { name: '대현기획', category: '인쇄 기획', tags: ['북디자인', '편집'], rating: '4.9', workload: 'RELAXED' },
+    { name: '정밀형압', category: '후가공', tags: ['형압', '박'], rating: '5.0', workload: 'BUSY' },
+    { name: '서진제본', category: '제본', tags: ['양장', '무선'], rating: '4.8', workload: 'NORMAL' },
+    { name: '삼화특수지', category: '용지공급', tags: ['특수지', '친환경'], rating: '4.7', workload: 'RELAXED' },
+    { name: '민영금박', category: '후가공', tags: ['금박', '은박'], rating: '4.6', workload: 'BUSY' },
+    { name: '우성코팅', category: '코팅', tags: ['UV코팅', '라미네이팅'], rating: '4.9', workload: 'NORMAL' },
+  ];
