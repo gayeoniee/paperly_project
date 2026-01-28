@@ -338,6 +338,30 @@
   color: var(--color-primary);
 }
 
+.exitQuoteBtn {
+  background: var(--color-text-muted);
+  color: white;
+  border-color: var(--color-text-muted);
+}
+
+.exitQuoteBtn:hover {
+  background: var(--color-text-light);
+  border-color: var(--color-text-light);
+  color: white;
+}
+
+.quoteBtn {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.quoteBtn:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  color: white;
+}
+
 /* Input Area */
 .inputArea {
   display: flex;
@@ -692,4 +716,268 @@
 
 .modalFooter button {
   flex: 1;
+}
+
+/* Quote Preview */
+.quotePreview {
+  background: var(--color-background-paper);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  min-width: 280px;
+  max-width: 360px;
+}
+
+.quotePreviewHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--color-primary);
+  color: white;
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+}
+
+.quotePreviewContent {
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.quoteItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.quoteItem:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.quoteLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.quoteValue {
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  font-weight: 500;
+  text-align: right;
+}
+
+.quotePreviewActions {
+  display: flex;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.quotePreviewActions button {
+  flex: 1;
+  font-size: var(--font-size-xs) !important;
+  padding: var(--space-sm) !important;
+}
+
+/* Maker Selection Modal */
+.makerModal {
+  background: var(--color-background-paper);
+  border-radius: var(--radius-xl);
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: var(--shadow-xl);
+  padding: var(--space-xl);
+}
+
+.makerModalHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.makerModalHeader h2 {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xl);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.makerModalDesc {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-lg) 0;
+}
+
+.makerList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.makerCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md);
+  background: var(--color-background);
+  border: 2px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.makerCard:hover {
+  border-color: var(--color-primary-light);
+  background: var(--color-accent-warm);
+}
+
+.makerCard.selected {
+  border-color: var(--color-primary);
+  background: var(--color-accent-warm);
+}
+
+.makerInfo {
+  flex: 1;
+}
+
+.makerTop {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xs);
+}
+
+.makerCategory {
+  font-size: var(--font-size-xs);
+  color: var(--color-secondary-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.makerRating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  color: var(--color-warning);
+  font-weight: 600;
+}
+
+.makerName {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+  margin: 0 0 var(--space-xs) 0;
+}
+
+.makerTags {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.makerTag {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  background: var(--color-background-paper);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.selectedCheck {
+  width: 32px;
+  height: 32px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.makerModalFooter {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.makerModalFooter button {
+  flex: 1;
+}
+
+/* Workload Badge */
+.workloadBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  margin-left: auto;
+}
+
+.workloadDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.workloadRelaxed {
+  background: rgba(123, 168, 118, 0.15);
+  color: #5a8a54;
+}
+
+.workloadRelaxed .workloadDot {
+  background: #7BA876;
+  box-shadow: 0 0 4px rgba(123, 168, 118, 0.6);
+}
+
+.workloadNormal {
+  background: rgba(212, 167, 106, 0.15);
+  color: #b8924a;
+}
+
+.workloadNormal .workloadDot {
+  background: #D4A76A;
+  box-shadow: 0 0 4px rgba(212, 167, 106, 0.6);
+}
+
+.workloadBusy {
+  background: rgba(205, 92, 92, 0.15);
+  color: #b54a4a;
+}
+
+.workloadBusy .workloadDot {
+  background: #CD5C5C;
+  box-shadow: 0 0 4px rgba(205, 92, 92, 0.6);
+}
+
+.workloadUnknown {
+  background: rgba(156, 163, 175, 0.15);
+  color: #6b7280;
+}
+
+.workloadUnknown .workloadDot {
+  background: #9CA3AF;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }

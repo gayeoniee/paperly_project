@@ -1,12 +1,35 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, ArrowLeft, Layers, Palette, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Send, Sparkles, ArrowLeft, Layers, Palette, X, ChevronLeft, ChevronRight, FileText, Building2, Star, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { askGemini } from '../../lib/gemini';
 import { searchPapersByKeywords } from '../../lib/supabase';
 import Button from '../../components/common/Button';
 import styles from './AIChat.module.css';
 
+// Mock 사장님 데이터 (나중에 Supabase에서 가져올 수 있음)
+const mockMakers = [
+  { id: 1, name: '대현기획', category: '인쇄 기획', rating: 4.9, tags: ['북디자인', '편집'], workload: 'RELAXED' },
+  { id: 2, name: '정밀형압', category: '후가공', rating: 5.0, tags: ['형압', '박'], workload: 'BUSY' },
+  { id: 3, name: '서진제본', category: '제본', rating: 4.8, tags: ['양장', '무선'], workload: 'NORMAL' },
+  { id: 4, name: '삼화특수지', category: '용지공급', rating: 4.7, tags: ['특수지', '친환경'], workload: 'RELAXED' },
+];
+
+// workload 상태 UI
+const getWorkloadUI = (status) => {
+  switch (status) {
+    case 'RELAXED':
+      return { label: '여유', className: styles.workloadRelaxed };
+    case 'NORMAL':
+      return { label: '보통', className: styles.workloadNormal };
+    case 'BUSY':
+      return { label: '분주', className: styles.workloadBusy };
+    default:
+      return { label: '확인불가', className: styles.workloadUnknown };
+  }
+};
+
 const suggestedKeywords = ['포근한 느낌', '고급스러운', '친환경', '빈티지', '명함용'];
+const quoteKeywords = ['품명 알려주기', '사이즈 변경', '수량 변경', '추가 요청사항'];
 
 // AI 메시지를 포맷팅하는 헬퍼 함수
 const formatAIMessage = (text) => {
@@ -113,6 +136,129 @@ const formatTextWithList = (text) => {
   );
 };
 
+// 견적 미리보기 컴포넌트
+function QuotePreview({ quoteData, onClose, onSendQuote }) {
+  if (!quoteData) return null;
+
+  return (
+    <div className={styles.quotePreview}>
+      <div className={styles.quotePreviewHeader}>
+        <FileText size={18} />
+        <span>견적 요청서 미리보기</span>
+      </div>
+      <div className={styles.quotePreviewContent}>
+        {quoteData.paperName && (
+          <div className={styles.quoteItem}>
+            <span className={styles.quoteLabel}>선택 종이</span>
+            <span className={styles.quoteValue}>{quoteData.paperName}</span>
+          </div>
+        )}
+        <div className={styles.quoteItem}>
+          <span className={styles.quoteLabel}>품명</span>
+          <span className={styles.quoteValue}>{quoteData.itemName || '-'}</span>
+        </div>
+        <div className={styles.quoteItem}>
+          <span className={styles.quoteLabel}>규격</span>
+          <span className={styles.quoteValue}>{quoteData.size || '-'}</span>
+        </div>
+        <div className={styles.quoteItem}>
+          <span className={styles.quoteLabel}>수량</span>
+          <span className={styles.quoteValue}>{quoteData.quantity || '-'}</span>
+        </div>
+        {quoteData.printType && (
+          <div className={styles.quoteItem}>
+            <span className={styles.quoteLabel}>인쇄방식</span>
+            <span className={styles.quoteValue}>{quoteData.printType}</span>
+          </div>
+        )}
+        {quoteData.notes && (
+          <div className={styles.quoteItem}>
+            <span className={styles.quoteLabel}>추가 요청</span>
+            <span className={styles.quoteValue}>{quoteData.notes}</span>
+          </div>
+        )}
+      </div>
+      <div className={styles.quotePreviewActions}>
+        <Button variant="secondary" size="small" onClick={onClose}>
+          수정하기
+        </Button>
+        <Button variant="primary" size="small" onClick={onSendQuote}>
+          사장님 선택하기
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// 사장님 선택 모달
+function MakerSelectionModal({ makers, selectedMaker, onSelect, onClose, onConfirm }) {
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.makerModal} onClick={(e) => e.stopPropagation()}>
+        <button className={styles.closeBtn} onClick={onClose}>
+          <X size={24} />
+        </button>
+        <div className={styles.makerModalHeader}>
+          <Building2 size={24} />
+          <h2>견적 요청할 사장님 선택</h2>
+        </div>
+        <p className={styles.makerModalDesc}>
+          견적 요청서를 보낼 사장님을 선택해주세요
+        </p>
+        <div className={styles.makerList}>
+          {makers.map((maker) => {
+            const workload = getWorkloadUI(maker.workload);
+            return (
+              <div
+                key={maker.id}
+                className={`${styles.makerCard} ${selectedMaker?.id === maker.id ? styles.selected : ''}`}
+                onClick={() => onSelect(maker)}
+              >
+                <div className={styles.makerInfo}>
+                  <div className={styles.makerTop}>
+                    <span className={styles.makerCategory}>{maker.category}</span>
+                    <span className={styles.makerRating}>
+                      <Star size={12} fill="currentColor" />
+                      {maker.rating}
+                    </span>
+                    <div className={`${styles.workloadBadge} ${workload.className}`}>
+                      <span className={styles.workloadDot}></span>
+                      <span>{workload.label}</span>
+                    </div>
+                  </div>
+                  <h3 className={styles.makerName}>{maker.name}</h3>
+                  <div className={styles.makerTags}>
+                    {maker.tags.map((tag, i) => (
+                      <span key={i} className={styles.makerTag}>#{tag}</span>
+                    ))}
+                  </div>
+                </div>
+                {selectedMaker?.id === maker.id && (
+                  <div className={styles.selectedCheck}>
+                    <Check size={20} />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div className={styles.makerModalFooter}>
+          <Button variant="secondary" onClick={onClose}>
+            취소
+          </Button>
+          <Button
+            variant="primary"
+            onClick={onConfirm}
+            disabled={!selectedMaker}
+          >
+            견적 요청 보내기
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PaperRecommendation({ paper, onSelect }) {
   const randomImg = getRandomVariantImage(paper.variants);
 
@@ -162,6 +308,11 @@ export default function AIChat() {
   const [isTyping, setIsTyping] = useState(false);
   const [selectedPaper, setSelectedPaper] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
+  const [quoteData, setQuoteData] = useState(null);
+  const [showQuotePreview, setShowQuotePreview] = useState(false);
+  const [showMakerSelection, setShowMakerSelection] = useState(false);
+  const [selectedMaker, setSelectedMaker] = useState(null);
+  const [isQuoteMode, setIsQuoteMode] = useState(false); // 견적 모드 상태
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -188,21 +339,69 @@ export default function AIChat() {
         text: m.text
       }));
 
-      // Gemini API 호출
-      const aiResponse = await askGemini(userInput, history);
+      // Gemini API 호출 (현재 모드 전달)
+      const aiResponse = await askGemini(userInput, history, isQuoteMode);
 
-      // 키워드로 종이 검색
-      const recommendedPapers = await searchPapersByKeywords(aiResponse.searchTerms);
+      // 견적 요청이 완료된 경우
+      if (aiResponse.type === 'quote_ready' && aiResponse.quoteData) {
+        setQuoteData(aiResponse.quoteData);
+        setIsQuoteMode(true);
 
-      const aiMessage = {
-        id: Date.now() + 1,
-        type: 'ai',
-        text: aiResponse.message,
-        papers: recommendedPapers,
-        keywords: aiResponse.keywords
-      };
+        const aiMessage = {
+          id: Date.now() + 1,
+          type: 'ai',
+          text: aiResponse.message,
+          responseType: 'quote_ready'
+        };
+        setMessages(prev => [...prev, aiMessage]);
 
-      setMessages(prev => [...prev, aiMessage]);
+        // 잠시 후 견적 미리보기 표시
+        setTimeout(() => {
+          setShowQuotePreview(true);
+        }, 500);
+      }
+      // 견적 정보 수집 중
+      else if (aiResponse.type === 'quote_collecting') {
+        setIsQuoteMode(true);
+        // 부분 수집된 데이터 저장
+        if (aiResponse.quoteData) {
+          setQuoteData(prev => ({
+            ...prev,
+            ...aiResponse.quoteData
+          }));
+        }
+
+        const aiMessage = {
+          id: Date.now() + 1,
+          type: 'ai',
+          text: aiResponse.message,
+          responseType: 'quote_collecting'
+        };
+        setMessages(prev => [...prev, aiMessage]);
+      }
+      // 일반 추천 (견적 모드가 아닐 때만 종이 검색)
+      else if (!isQuoteMode) {
+        // 키워드로 종이 검색
+        const recommendedPapers = await searchPapersByKeywords(aiResponse.searchTerms);
+
+        const aiMessage = {
+          id: Date.now() + 1,
+          type: 'ai',
+          text: aiResponse.message,
+          papers: recommendedPapers,
+          keywords: aiResponse.keywords
+        };
+        setMessages(prev => [...prev, aiMessage]);
+      }
+      // 견적 모드인데 recommendation 타입이 온 경우 (텍스트만 표시)
+      else {
+        const aiMessage = {
+          id: Date.now() + 1,
+          type: 'ai',
+          text: aiResponse.message
+        };
+        setMessages(prev => [...prev, aiMessage]);
+      }
     } catch (error) {
       console.error('Error in AI chat:', error);
       const errorMessage = {
@@ -240,12 +439,76 @@ export default function AIChat() {
 
   const handleRequestQuote = (paper) => {
     closePaperDetail();
+    // 선택한 종이 정보를 quoteData에 저장
+    setQuoteData(prev => ({
+      ...prev,
+      paperName: paper.paper_name
+    }));
     const detailMessage = {
       id: Date.now(),
       type: 'ai',
       text: `**${paper.paper_name}**을(를) 선택하셨네요!\n\n이 종이로 견적을 요청하시려면 아래 정보를 알려주세요:\n- 인쇄물 종류 (명함, 브로슈어 등)\n- 수량\n- 원하는 사이즈`,
     };
     setMessages(prev => [...prev, detailMessage]);
+  };
+
+  const handleCloseQuotePreview = () => {
+    setShowQuotePreview(false);
+    // 수정을 원하면 메시지 추가
+    const modifyMessage = {
+      id: Date.now(),
+      type: 'ai',
+      text: '견적 내용을 수정하고 싶으시면 원하시는 부분을 말씀해주세요!',
+    };
+    setMessages(prev => [...prev, modifyMessage]);
+  };
+
+  const handleOpenMakerSelection = () => {
+    setShowQuotePreview(false);
+    setShowMakerSelection(true);
+  };
+
+  const handleSelectMaker = (maker) => {
+    setSelectedMaker(maker);
+  };
+
+  const handleCloseMakerSelection = () => {
+    setShowMakerSelection(false);
+    setSelectedMaker(null);
+    // 견적 미리보기 다시 표시
+    setShowQuotePreview(true);
+  };
+
+  const handleExitQuoteMode = () => {
+    setIsQuoteMode(false);
+    setQuoteData(null);
+    const exitMessage = {
+      id: Date.now(),
+      type: 'ai',
+      text: '종이 추천 모드로 돌아왔어요! 어떤 느낌의 종이를 찾고 계신가요?',
+    };
+    setMessages(prev => [...prev, exitMessage]);
+  };
+
+  const handleConfirmQuote = () => {
+    if (!selectedMaker || !quoteData) return;
+
+    // 견적 요청 완료 메시지
+    const confirmMessage = {
+      id: Date.now(),
+      type: 'ai',
+      text: `**${selectedMaker.name}** 사장님께 견적 요청을 보냈습니다! 🎉\n\n사장님이 확인하시면 연락드릴 거예요. 다른 도움이 필요하시면 말씀해주세요!`,
+    };
+    setMessages(prev => [...prev, confirmMessage]);
+
+    // 상태 초기화
+    setShowMakerSelection(false);
+    setSelectedMaker(null);
+    setQuoteData(null);
+    setIsQuoteMode(false); // 견적 모드 종료
+
+    // TODO: 실제 견적 요청 API 호출
+    console.log('Quote request sent:', { maker: selectedMaker, quoteData });
   };
 
   return (
@@ -319,20 +582,64 @@ export default function AIChat() {
           </div>
         )}
 
+        {/* 견적 미리보기 */}
+        {showQuotePreview && quoteData && (
+          <div className={`${styles.message} ${styles.ai}`}>
+            <div className={styles.aiAvatarSmall}>
+              <Sparkles size={14} />
+            </div>
+            <div className={styles.messageContent}>
+              <QuotePreview
+                quoteData={quoteData}
+                onClose={handleCloseQuotePreview}
+                onSendQuote={handleOpenMakerSelection}
+              />
+            </div>
+          </div>
+        )}
+
         <div ref={messagesEndRef} />
       </div>
 
       {/* Suggested Keywords */}
       <div className={styles.suggestions}>
-        {suggestedKeywords.map(keyword => (
-          <button
-            key={keyword}
-            className={styles.suggestionBtn}
-            onClick={() => handleKeywordClick(keyword)}
-          >
-            {keyword}
-          </button>
-        ))}
+        {isQuoteMode ? (
+          <>
+            <button
+              className={`${styles.suggestionBtn} ${styles.exitQuoteBtn}`}
+              onClick={handleExitQuoteMode}
+            >
+              ← 종이 추천으로
+            </button>
+            {quoteKeywords.map(keyword => (
+              <button
+                key={keyword}
+                className={styles.suggestionBtn}
+                onClick={() => handleKeywordClick(keyword)}
+              >
+                {keyword}
+              </button>
+            ))}
+          </>
+        ) : (
+          <>
+            {suggestedKeywords.map(keyword => (
+              <button
+                key={keyword}
+                className={styles.suggestionBtn}
+                onClick={() => handleKeywordClick(keyword)}
+              >
+                {keyword}
+              </button>
+            ))}
+            <button
+              className={`${styles.suggestionBtn} ${styles.quoteBtn}`}
+              onClick={() => handleKeywordClick('견적 요청하고 싶어요')}
+            >
+              견적 요청
+            </button>
+          </>
+        )}
       </div>
 
       {/* Input Area */}
@@ -465,6 +772,17 @@ export default function AIChat() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Maker Selection Modal */}
+      {showMakerSelection && (
+        <MakerSelectionModal
+          makers={mockMakers}
+          selectedMaker={selectedMaker}
+          onSelect={handleSelectMaker}
+          onClose={handleCloseMakerSelection}
+          onConfirm={handleConfirmQuote}
+        />
       )}
     </div>
   );
