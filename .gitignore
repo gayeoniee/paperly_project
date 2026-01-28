@@ -21,3 +21,9 @@ pnpm-debug.log*
 
 # macOS
 .DS_Store
+
+# Binary files
+*.jpg
+*.pdf
+*.txt
+*.jfif
