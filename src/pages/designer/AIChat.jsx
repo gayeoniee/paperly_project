@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, ArrowLeft, Layers, Palette, X, ChevronLeft, ChevronRight, FileText, Building2, Star, Check } from 'lucide-react';
+import { Send, Sparkles, ArrowLeft, Layers, Palette, X, ChevronLeft, ChevronRight, FileText, Building2, Star, Check, ZoomIn } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { askGemini } from '../../lib/gemini';
 import { searchPapersByKeywords } from '../../lib/supabase';
@@ -135,6 +135,23 @@ const formatTextWithList = (text) => {
     </ul>
   );
 };
+
+// 이미지 확대 컴포넌트
+function ImageZoomModal({ imageUrl, onClose }) {
+  if (!imageUrl) return null;
+
+  return (
+    <div className={styles.zoomOverlay} onClick={onClose}>
+      <button className={styles.zoomCloseBtn} onClick={onClose}>
+        <X size={24} />
+      </button>
+      <div className={styles.zoomContainer}>
+        <img src={imageUrl} alt="확대 이미지" className={styles.zoomedImage} />
+        <p className={styles.zoomHint}>클릭하여 닫기</p>
+      </div>
+    </div>
+  );
+}
 
 // 견적 미리보기 컴포넌트
 function QuotePreview({ quoteData, onClose, onSendQuote }) {
@@ -308,6 +325,7 @@ export default function AIChat() {
   const [isTyping, setIsTyping] = useState(false);
   const [selectedPaper, setSelectedPaper] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
+  const [zoomedImage, setZoomedImage] = useState(null);
   const [quoteData, setQuoteData] = useState(null);
   const [showQuotePreview, setShowQuotePreview] = useState(false);
   const [showMakerSelection, setShowMakerSelection] = useState(false);
@@ -339,8 +357,8 @@ export default function AIChat() {
         text: m.text
       }));
 
-      // Gemini API 호출 (현재 모드 전달)
-      const aiResponse = await askGemini(userInput, history, isQuoteMode);
+      // Gemini API 호출 (현재 모드와 기존 견적 데이터 전달)
+      const aiResponse = await askGemini(userInput, history, isQuoteMode, quoteData);
 
       // 견적 요청이 완료된 경우
       if (aiResponse.type === 'quote_ready' && aiResponse.quoteData) {
@@ -439,11 +457,12 @@ export default function AIChat() {
 
   const handleRequestQuote = (paper) => {
     closePaperDetail();
+    // 견적 모드 활성화
+    setIsQuoteMode(true);
     // 선택한 종이 정보를 quoteData에 저장
-    setQuoteData(prev => ({
-      ...prev,
+    setQuoteData({
       paperName: paper.paper_name
-    }));
+    });
     const detailMessage = {
       id: Date.now(),
       type: 'ai',
@@ -671,10 +690,19 @@ export default function AIChat() {
             </button>
 
             <div className={styles.paperModalContent}>
-              {/* 종이 이미지 */}
-              <div className={styles.paperModalImage}>
+              {/* 종이 이미지 - 클릭하여 확대 */}
+              <div
+                className={`${styles.paperModalImage} ${selectedVariant?.paper_img ? styles.zoomable : ''}`}
+                onClick={() => selectedVariant?.paper_img && setZoomedImage(selectedVariant.paper_img)}
+              >
                 {selectedVariant?.paper_img ? (
-                  <img src={selectedVariant.paper_img} alt={selectedVariant.paper_name} />
+                  <>
+                    <img src={selectedVariant.paper_img} alt={selectedVariant.paper_name} />
+                    <div className={styles.zoomHintBadge}>
+                      <ZoomIn size={16} />
+                      <span>클릭하여 확대</span>
+                    </div>
+                  </>
                 ) : (
                   <div className={styles.paperModalPlaceholder}>
                     <Layers size={48} />
@@ -782,6 +810,14 @@ export default function AIChat() {
           onSelect={handleSelectMaker}
           onClose={handleCloseMakerSelection}
           onConfirm={handleConfirmQuote}
+        />
+      )}
+
+      {/* Image Zoom Modal */}
+      {zoomedImage && (
+        <ImageZoomModal
+          imageUrl={zoomedImage}
+          onClose={() => setZoomedImage(null)}
         />
       )}
     </div>

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Sparkles, ArrowRight, Layers, Palette, X,
   ChevronLeft, ChevronRight, Star, MapPin, User,
-  MessageCircle, Phone, Award, AlertTriangle
+  MessageCircle, Phone, Award, AlertTriangle, ZoomIn
 } from 'lucide-react';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
@@ -210,6 +210,7 @@ export default function Home() {
   const [selectedPaper, setSelectedPaper] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [selectedPortfolio, setSelectedPortfolio] = useState(null);
+  const [zoomedImage, setZoomedImage] = useState(null);
   const [showBusyWarning, setShowBusyWarning] = useState(false);
   const [pendingPortfolio, setPendingPortfolio] = useState(null);
   const paperScrollRef = useRef(null);
@@ -477,10 +478,19 @@ export default function Home() {
             </button>
 
             <div className={styles.paperModalContent}>
-              {/* 종이 이미지 */}
-              <div className={styles.paperModalImage}>
+              {/* 종이 이미지 - 클릭하여 확대 */}
+              <div
+                className={`${styles.paperModalImage} ${selectedVariant?.paper_img ? styles.zoomable : ''}`}
+                onClick={() => selectedVariant?.paper_img && setZoomedImage(selectedVariant.paper_img)}
+              >
                 {selectedVariant?.paper_img ? (
-                  <img src={selectedVariant.paper_img} alt={selectedVariant.paper_name} />
+                  <>
+                    <img src={selectedVariant.paper_img} alt={selectedVariant.paper_name} />
+                    <div className={styles.zoomHintBadge}>
+                      <ZoomIn size={16} />
+                      <span>클릭하여 확대</span>
+                    </div>
+                  </>
                 ) : (
                   <div className={styles.paperModalPlaceholder}>
                     <Layers size={64} />
@@ -717,6 +727,19 @@ export default function Home() {
                 그래도 문의하기
               </Button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 이미지 확대 모달 */}
+      {zoomedImage && (
+        <div className={styles.zoomOverlay} onClick={() => setZoomedImage(null)}>
+          <button className={styles.zoomCloseBtn} onClick={() => setZoomedImage(null)}>
+            <X size={24} />
+          </button>
+          <div className={styles.zoomContainer}>
+            <img src={zoomedImage} alt="확대 이미지" className={styles.zoomedImage} />
+            <p className={styles.zoomHint}>클릭하여 닫기</p>
           </div>
         </div>
       )}

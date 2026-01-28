@@ -4,7 +4,7 @@ import {
   Star, MapPin, ChevronRight, X,
   ArrowRight, Bell, Phone, Clock, Award,
   ChevronLeft, Layers, Palette, FileText, Sparkles, User,
-  HeartHandshake, Users, Package
+  HeartHandshake, Users, Package, ZoomIn
 } from 'lucide-react';
 
 // variants에서 랜덤 이미지 가져오기
@@ -152,6 +152,7 @@ export default function Home() {
   const [selectedPaper, setSelectedPaper] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [loadingPapers, setLoadingPapers] = useState(true);
+  const [zoomedImage, setZoomedImage] = useState(null);
   const paperScrollRef = useRef(null);
   const portfolioScrollRef = useRef(null);
 
@@ -609,12 +610,30 @@ export default function Home() {
             </button>
 
             <div className={styles.paperModalContent}>
-              {/* 종이 이미지 */}
-              <div className={styles.paperModalImage}>
+              {/* 종이 이미지 - 클릭하여 확대 */}
+              <div
+                className={`${styles.paperModalImage} ${(selectedVariant?.paper_img || selectedPaper.env_img) ? styles.zoomable : ''}`}
+                onClick={() => {
+                  const imgUrl = selectedVariant?.paper_img || selectedPaper.env_img;
+                  if (imgUrl) setZoomedImage(imgUrl);
+                }}
+              >
                 {selectedVariant?.paper_img ? (
-                  <img src={selectedVariant.paper_img} alt={selectedVariant.paper_name} />
+                  <>
+                    <img src={selectedVariant.paper_img} alt={selectedVariant.paper_name} />
+                    <div className={styles.zoomHintBadge}>
+                      <ZoomIn size={16} />
+                      <span>클릭하여 확대</span>
+                    </div>
+                  </>
                 ) : selectedPaper.env_img ? (
-                  <img src={selectedPaper.env_img} alt={selectedPaper.paper_name} />
+                  <>
+                    <img src={selectedPaper.env_img} alt={selectedPaper.paper_name} />
+                    <div className={styles.zoomHintBadge}>
+                      <ZoomIn size={16} />
+                      <span>클릭하여 확대</span>
+                    </div>
+                  </>
                 ) : (
                   <div className={styles.paperModalPlaceholder}>
                     <Layers size={64} />
@@ -738,6 +757,19 @@ export default function Home() {
                 이 종이로 견적 요청
               </Button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 이미지 확대 모달 */}
+      {zoomedImage && (
+        <div className={styles.zoomOverlay} onClick={() => setZoomedImage(null)}>
+          <button className={styles.zoomCloseBtn} onClick={() => setZoomedImage(null)}>
+            <X size={24} />
+          </button>
+          <div className={styles.zoomContainer}>
+            <img src={zoomedImage} alt="확대 이미지" className={styles.zoomedImage} />
+            <p className={styles.zoomHint}>클릭하여 닫기</p>
           </div>
         </div>
       )}

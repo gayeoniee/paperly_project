@@ -355,6 +355,8 @@
   height: 320px;
   overflow: hidden;
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  position: relative;
+  cursor: zoom-in;
 }
 
 .paperModalImage img {
@@ -941,6 +943,87 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
+}
+
+/* Image Zoom */
+.zoomable {
+  cursor: zoom-in;
+  position: relative;
+}
+
+.zoomHintBadge {
+  position: absolute;
+  bottom: var(--space-md);
+  right: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.zoomable:hover .zoomHintBadge {
+  opacity: 1;
+}
+
+.zoomOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  cursor: zoom-out;
+}
+
+.zoomCloseBtn {
+  position: absolute;
+  top: var(--space-lg);
+  right: var(--space-lg);
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  cursor: pointer;
+  color: white;
+  padding: var(--space-sm);
+  border-radius: 50%;
+  z-index: 10;
+  transition: all var(--transition-fast);
+}
+
+.zoomCloseBtn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.zoomContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+.zoomedImage {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.zoomHint {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: var(--font-size-sm);
+  margin: 0;
 }
 
 /* Tablet (768px+) */
